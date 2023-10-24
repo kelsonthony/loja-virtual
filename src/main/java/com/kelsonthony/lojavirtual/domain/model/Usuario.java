@@ -25,9 +25,14 @@ import javax.persistence.UniqueConstraint;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(catalog = "usuario")
 @SequenceGenerator(name = "seq_usuario", sequenceName = "seq_usuario", initialValue = 1, allocationSize = 1)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Usuario implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;
@@ -51,10 +56,12 @@ public class Usuario implements UserDetails {
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
 	private Pessoa pessoa;
 	
-	@OneToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "usuario_acesso", uniqueConstraints = @UniqueConstraint(columnNames = {"usuario_id", "acesso_id"},
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "usuario_acesso", 
+	uniqueConstraints = @UniqueConstraint(columnNames = {"usuario_id", "acesso_id"},
 	name = "unique_acesso_user"), 
-	joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false,
+	joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", 
+	unique = false,
 	foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
 	inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso",
 	foreignKey = @ForeignKey(name = "acesso_fk", value = ConstraintMode.CONSTRAINT)))
@@ -63,15 +70,76 @@ public class Usuario implements UserDetails {
 	/**
 	 * Autoridades = São os acessos, ou seja ROLE_ADMIN, ROLE_SECRETARIO, ROLE_FINANCEIRO
 	 */
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+	
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
+	
+	
+	
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public void setLogin(String login) {
+		this.login = login;
+	}
+
+	public String getSenha() {
+		return senha;
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
+
+	public Date getDataAtualSenha() {
+		return dataAtualSenha;
+	}
+
+	public void setDataAtualSenha(Date dataAtualSenha) {
+		this.dataAtualSenha = dataAtualSenha;
+	}
+
+	public List<Acesso> getAcessos() {
+		return acessos;
+	}
+
+	public void setAcessos(List<Acesso> acessos) {
+		this.acessos = acessos;
+	}
+
+	/*Autoridades = São os acesso, ou seja ROLE_ADMIN, ROLE_SECRETARIO, ROLE_FINACEIRO*/
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
+		
 		return this.acessos;
 	}
 
-	
+	@Override
+	public String getPassword() {
+		return this.senha;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.login;
+	}
+
 	@Override
 	public boolean isAccountNonExpired() {
-
 		return true;
 	}
 
@@ -89,81 +157,6 @@ public class Usuario implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
-
-
-	public Long getId() {
-		return id;
-	}
-
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-	public String getLogin() {
-		return login;
-	}
-
-
-	public void setLogin(String login) {
-		this.login = login;
-	}
-
-
-	public String getSenha() {
-		return senha;
-	}
-
-
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
-
-
-	public Date getDataAtualSenha() {
-		return dataAtualSenha;
-	}
-
-
-	public void setDataAtualSenha(Date dataAtualSenha) {
-		this.dataAtualSenha = dataAtualSenha;
-	}
-
-
-	public Pessoa getPessoa() {
-		return pessoa;
-	}
-
-
-	public void setPessoa(Pessoa pessoa) {
-		this.pessoa = pessoa;
-	}
-
-
-	public List<Acesso> getAcessos() {
-		return acessos;
-	}
-
-
-	public void setAcessos(List<Acesso> acessos) {
-		this.acessos = acessos;
-	}
-
-
-	@Override
-	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	
 
 }

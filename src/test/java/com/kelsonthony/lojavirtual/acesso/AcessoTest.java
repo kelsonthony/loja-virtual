@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -257,6 +258,11 @@ class AcessoTest extends TestCase {
 		assertEquals(true, acesso.getId() > 0);
 		assertEquals("ROLE_ADMIN2", acesso.getDescricao());
 		
+	}
+	
+	@Test
+	void gerarSenhaCriptografada() {
+		System.out.println("Minha Senha: " + new BCryptPasswordEncoder().encode("123"));
 	}
 
 }
