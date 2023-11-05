@@ -1,5 +1,6 @@
 package com.kelsonthony.lojavirtual.security;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,15 +15,17 @@ import com.kelsonthony.lojavirtual.config.context.ApplicationContextLoad;
 import com.kelsonthony.lojavirtual.domain.model.Usuario;
 import com.kelsonthony.lojavirtual.domain.repository.UsuarioRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 
 @Service
 @Component
 public class JWTTokenAutenticacaoService {
 	
 	
-	private static final long EXPIRATION_TIME = 259990000;
+	private static final long EXPIRATION_TIME = 259990000; // valor para 11 dias em miliseconds
 	
 	private static final String SECRET = "ss/-*-*sdfsdfsdfsd-s/d-s*dadsdf";
 	
@@ -61,9 +64,11 @@ public class JWTTokenAutenticacaoService {
 	/*
 	 * Retorna o usuário validado com token ou caso não seja valido, retorna null
 	 */
-	public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse response) {
+	public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse response) throws IOException  {
 		
 		String token = request.getHeader(HEADER_STRING);
+		
+		try {
 		
 		if (token != null) {
 			
@@ -92,7 +97,21 @@ public class JWTTokenAutenticacaoService {
 			}
 		}
 		
-		liberacaoCors(response);
+		} catch (SignatureException e) {
+			response.getWriter().write("Token está inválido");
+			
+		} catch (ExpiredJwtException e) {
+			response.getWriter().write("Token está expirado, efetuar o login novamente");
+			
+		}
+		catch (IllegalStateException e) {
+			response.getWriter().write("Token está expirado, efetuar o login novamente, illegal");
+			
+		}
+		finally {
+			liberacaoCors(response);
+		}
+		
 		return null;
 	}
 	
