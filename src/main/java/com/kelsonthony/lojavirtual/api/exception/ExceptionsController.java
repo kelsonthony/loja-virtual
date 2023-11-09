@@ -1,4 +1,4 @@
-package com.kelsonthony.lojavirtual.api.controller;
+package com.kelsonthony.lojavirtual.api.exception;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,6 +22,15 @@ import com.kelsonthony.lojavirtual.api.dto.ObjetoErroDTO;
 @ControllerAdvice
 public class ExceptionsController extends ResponseEntityExceptionHandler {
 
+	@ExceptionHandler(LojaVirtualException.class)
+	public ResponseEntity<Object> handleCustomException(LojaVirtualException ex) {
+		ObjetoErroDTO objetoErroDTO = new ObjetoErroDTO();
+		
+		objetoErroDTO.setError(ex.getMessage());
+		objetoErroDTO.setCode(HttpStatus.OK.toString());
+		
+		return new ResponseEntity<Object>(objetoErroDTO, HttpStatus.OK);
+	}
 	/**
 	 * Captura exceções do projeto
 	 */
@@ -52,7 +61,7 @@ public class ExceptionsController extends ResponseEntityExceptionHandler {
 	
 	
 	/**
-	 * Caputa erro da banco de dados
+	 * Capitura erro do banco de dados
 	 * @return
 	 */
 	@ExceptionHandler({DataIntegrityViolationException.class, ConstraintViolationException.class,
@@ -77,6 +86,8 @@ public class ExceptionsController extends ResponseEntityExceptionHandler {
 		
 		objetoErroDTO.setError(msg);
 		objetoErroDTO.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+		
+		ex.printStackTrace();
 		
 		return new ResponseEntity<>(objetoErroDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kelsonthony.lojavirtual.LojaVirtualApplication;
 import com.kelsonthony.lojavirtual.api.controller.AcessoController;
+import com.kelsonthony.lojavirtual.api.exception.LojaVirtualException;
 import com.kelsonthony.lojavirtual.domain.model.Acesso;
 import com.kelsonthony.lojavirtual.domain.repository.AcessoRepository;
 import com.kelsonthony.lojavirtual.domain.service.AcessoService;
@@ -229,7 +230,12 @@ class AcessoTest extends TestCase {
 		
 		acesso.setDescricao("ROLE_ALUNO");
 		
-		acesso = acessoController.salvarAcesso(acesso).getBody();
+		try {
+			acesso = acessoController.salvarAcesso(acesso).getBody();
+		} catch (LojaVirtualException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		List<Acesso> acessos = acessoRepository.buscarAcessDesc("ALUNO".trim().toUpperCase());
 		
@@ -253,7 +259,12 @@ class AcessoTest extends TestCase {
 		
 		Acesso acesso = new Acesso();
 		acesso.setDescricao("ROLE_ADMIN2");
-		acesso = acessoController.salvarAcesso(acesso).getBody();
+		try {
+			acesso = acessoController.salvarAcesso(acesso).getBody();
+		} catch (LojaVirtualException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		assertEquals(true, acesso.getId() > 0);
 		assertEquals("ROLE_ADMIN2", acesso.getDescricao());

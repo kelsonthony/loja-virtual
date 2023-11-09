@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kelsonthony.lojavirtual.api.exception.LojaVirtualException;
 import com.kelsonthony.lojavirtual.domain.model.Acesso;
 import com.kelsonthony.lojavirtual.domain.repository.AcessoRepository;
 import com.kelsonthony.lojavirtual.domain.service.AcessoService;
@@ -31,7 +32,16 @@ public class AcessoController {
 	
 	@ResponseBody
 	@PostMapping(value = "/salvarAcesso")
-	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) {
+	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) throws LojaVirtualException {
+		
+		if(acesso.getId() == null) {
+			List<Acesso> acessos = acessoRepository.buscarAcessDesc(acesso.getDescricao().toUpperCase());
+			
+			if(!acessos.isEmpty()) {
+				throw new LojaVirtualException("Já existe Acesso com a descrição: " + acesso.getDescricao());
+			}
+		}
+		
 		
 		Acesso acessoSalvo = acessoService.save(acesso);
 				
@@ -60,9 +70,13 @@ public class AcessoController {
 	
 	@ResponseBody
 	@GetMapping(value = "/obterAcesso/{id}")
-	public ResponseEntity<Acesso> obterAcesso(@PathVariable("id") Long id) {
+	public ResponseEntity<Acesso> obterAcesso(@PathVariable("id") Long id) throws LojaVirtualException {
 		
-		Acesso acesso = acessoRepository.findById(id).get();
+		Acesso acesso = acessoRepository.findById(id).orElse(null);
+		
+		if (acesso == null) {
+			throw new LojaVirtualException("Não encontrou Acesso com o código: " + id);
+		}
 				
 		return new ResponseEntity<Acesso>(acesso, HttpStatus.OK);
 	}
@@ -71,7 +85,7 @@ public class AcessoController {
 	@GetMapping(value = "/buscarPorDesc/{desc}")
 	public ResponseEntity<List<Acesso>> buscarPorDesc(@PathVariable("desc") String desc) {
 		
-		List<Acesso> acesso = acessoRepository.buscarAcessDesc(desc);
+		List<Acesso> acesso = acessoRepository.buscarAcessDesc(desc.toUpperCase());
 				
 		return new ResponseEntity<List<Acesso>>(acesso, HttpStatus.OK);
 	}
