@@ -25,21 +25,45 @@ public class AvaliacaoProduto implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "seq_avaliacao_produto")
 	private Long id;
-	
+
 	@Column(nullable = false)
 	private String descricao;
-	
+
 	@Column(nullable = false)
 	private Integer nota;
-	
+
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "pessoa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
 	private Pessoa pessoa;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "produto_id", nullable = false, 
-	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "produto_fk"))
+	@JoinColumn(name = "produto_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "produto_fk"))
 	private Produto produto;
+	
+	@ManyToOne(targetEntity = Pessoa.class)
+	@JoinColumn(name = "empresa_id", nullable = false, 
+	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_id_fk"))
+	private Pessoa empresa;
+	
+	
+
+	public AvaliacaoProduto(Long id, String descricao, Integer nota, Pessoa pessoa, Produto produto, Pessoa empresa) {
+		super();
+		this.id = id;
+		this.descricao = descricao;
+		this.nota = nota;
+		this.pessoa = pessoa;
+		this.produto = produto;
+		this.empresa = empresa;
+	}
+
+	public Pessoa getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(Pessoa empresa) {
+		this.empresa = empresa;
+	}
 
 	public Long getId() {
 		return id;
@@ -103,6 +127,5 @@ public class AvaliacaoProduto implements Serializable {
 		return "AvaliacaoProduto [id=" + id + ", descricao=" + descricao + ", nota=" + nota + ", pessoa=" + pessoa
 				+ ", produto=" + produto + "]";
 	}
-	
-	
+
 }

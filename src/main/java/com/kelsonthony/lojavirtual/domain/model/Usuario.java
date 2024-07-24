@@ -31,8 +31,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(catalog = "usuario")
 @SequenceGenerator(name = "seq_usuario", sequenceName = "seq_usuario", initialValue = 1, allocationSize = 1)
-@AllArgsConstructor
-@NoArgsConstructor
 public class Usuario implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;
@@ -41,7 +39,7 @@ public class Usuario implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
 	private Long id;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String login;
 	
 	@Column(nullable = false)
@@ -56,6 +54,11 @@ public class Usuario implements UserDetails {
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
 	private Pessoa pessoa;
 	
+	@ManyToOne(targetEntity = Pessoa.class)
+	@JoinColumn(name = "empresa_id", nullable = false, 
+	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_id_fk"))
+	private Pessoa empresa;
+	
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_acesso", 
 	uniqueConstraints = @UniqueConstraint(columnNames = {"usuario_id", "acesso_id"},
@@ -66,6 +69,31 @@ public class Usuario implements UserDetails {
 	inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso",
 	foreignKey = @ForeignKey(name = "acesso_fk", value = ConstraintMode.CONSTRAINT)))
 	private List<Acesso> acessos;
+	
+	
+	public Usuario() {
+		
+	}
+
+	public Usuario(Long id, String login, String senha, Date dataAtualSenha, Pessoa pessoa, Pessoa empresa,
+			List<Acesso> acessos) {
+		super();
+		this.id = id;
+		this.login = login;
+		this.senha = senha;
+		this.dataAtualSenha = dataAtualSenha;
+		this.pessoa = pessoa;
+		this.empresa = empresa;
+		this.acessos = acessos;
+	}
+
+	public Pessoa getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(Pessoa empresa) {
+		this.empresa = empresa;
+	}
 
 	/**
 	 * Autoridades = São os acessos, ou seja ROLE_ADMIN, ROLE_SECRETARIO, ROLE_FINANCEIRO
